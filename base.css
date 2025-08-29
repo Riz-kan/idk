@@ -4266,3 +4266,70 @@ text-component {
     font-size: max(1rem, 100%);
   }
 }
+/* Premium fade for transparent ↔ opaque */
+.header[transparent] .header__row,
+.header[transparent][transparent='not-sticky'][data-sticky-state='active'] .header__row,
+.header[transparent]:has(.mega-menu__list:hover) .header__row,
+.header[transparent]:has(.menu-list__link[aria-haspopup]:is(:hover,[aria-expanded='true'],[data-animating])) .header__row,
+.header[transparent]:has(.menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover,[aria-expanded='true'],[data-animating])) .header__row {
+  transition:
+    background-color 260ms cubic-bezier(.25,.8,.25,1),
+    color            260ms cubic-bezier(.25,.8,.25,1),
+    border-color     260ms cubic-bezier(.25,.8,.25,1);
+  will-change: background-color, color, border-color;
+}
+
+/* Subtle float when transparent idle */
+.header[transparent]:not([data-sticky-state='active']):not(:has(.mega-menu__list:hover,.menu-list__link[aria-haspopup])) .header__row {
+  transform: translateY(-2px);
+  transition: transform 260ms cubic-bezier(.25,.8,.25,1);
+}
+.header[transparent][data-sticky-state='active'] .header__row,
+.header[transparent]:has(.mega-menu__list:hover,.menu-list__link[aria-haspopup]) .header__row {
+  transform: translateY(0);
+}
+
+/* Crossfade logos (keep both mounted) */
+.header[transparent] .header-logo,
+.header[transparent] .header-logo--inverse {
+  transition: opacity 200ms cubic-bezier(.25,.8,.25,1);
+}
+
+.header[transparent] {
+  --logo-opaque: 0;
+  --logo-inverse: 1;
+}
+.header[transparent] .header-logo         { opacity: var(--logo-opaque) }
+.header[transparent] .header-logo--inverse{ opacity: var(--logo-inverse) }
+
+.header[transparent][transparent='not-sticky'][data-sticky-state='active'],
+.header[transparent]:has(.mega-menu__list:hover,.menu-list__link[aria-haspopup]) {
+  --logo-opaque: 1;
+  --logo-inverse: 0;
+}
+
+/* Backdrop blur only when opaque/engaged */
+.header[transparent] .header__row { backdrop-filter: none; }
+@supports (backdrop-filter: blur(6px)) {
+  .header[transparent][transparent='not-sticky'][data-sticky-state='active'] .header__row,
+  .header[transparent]:has(.mega-menu__list:hover,.menu-list__link[aria-haspopup]) .header__row {
+    backdrop-filter: blur(6px);
+  }
+}
+
+/* Never fade the entire header during sticky transitions */
+.header[data-sticky-state='active'][data-animating] { opacity: 1 !important; }
+
+/* Reduce motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .header[transparent] .header__row,
+  .header[transparent] .header-logo,
+  .header[transparent] .header-logo--inverse {
+    transition: none !important;
+    transform: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* Localize repaints to the header */
+.header { contain: paint; }
